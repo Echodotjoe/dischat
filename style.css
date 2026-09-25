@@ -136,7 +136,7 @@ body, html {
   font-weight: normal;
 }
 
-/* Chat Messages */
+/* Chat Messages Area */
 .chat-area {
   display: flex;
   flex-direction: column;
