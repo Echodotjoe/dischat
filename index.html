@@ -6,8 +6,8 @@
   <title>Discord Blue Chat</title>
   <link rel="stylesheet" href="style.css">
   
-  <!-- Free MQTT Library for Real-Time Chat (No Account Needed) -->
-  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <!-- Compatible MQTT Library for WebSockets -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js"></script>
 </head>
 <body>
   <div class="app-container">
@@ -25,7 +25,7 @@
 
       <div class="header-title">
         <span class="hashtag">#</span> global-chat
-        <span class="subtext">(Auto-deletes after 7 mins)</span>
+        <span id="conn-status" class="conn-badge connecting">Connecting...</span>
       </div>
 
       <button id="export-txt-btn" class="export-btn">Download Chat (.txt)</button>
@@ -38,8 +38,8 @@
       <!-- Chat Input Area -->
       <footer class="chat-input-area">
         <form id="chat-form">
-          <input type="text" id="message-input" autocomplete="off" placeholder="Message #global-chat..." required>
-          <button type="submit" id="send-btn">Send</button>
+          <input type="text" id="message-input" autocomplete="off" placeholder="Message #global-chat..." required disabled>
+          <button type="submit" id="send-btn" disabled>Send</button>
         </form>
       </footer>
     </main>
