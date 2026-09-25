@@ -13,6 +13,8 @@
   --text-light: #ffffff;
   --border-color: #2b2d31;
   --success-color: #23a55a;
+  --danger-color: #f23f43;
+  --warning-color: #f0b232;
 }
 
 * {
@@ -116,10 +118,36 @@ body, html {
   border: 1px solid var(--success-color);
 }
 
+/* Connection Status Badges */
+.conn-badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.conn-badge.connecting {
+  color: var(--warning-color);
+  background: rgba(240, 178, 50, 0.15);
+  border: 1px solid var(--warning-color);
+}
+
+.conn-badge.connected {
+  color: var(--success-color);
+  background: rgba(35, 165, 90, 0.15);
+  border: 1px solid var(--success-color);
+}
+
+.conn-badge.disconnected {
+  color: var(--danger-color);
+  background: rgba(242, 63, 67, 0.15);
+  border: 1px solid var(--danger-color);
+}
+
 .header-title {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-weight: 700;
   font-size: 16px;
   color: var(--text-light);
@@ -128,12 +156,6 @@ body, html {
 .header-title .hashtag {
   color: var(--text-muted);
   font-size: 20px;
-}
-
-.header-title .subtext {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: normal;
 }
 
 /* Chat Messages Area */
@@ -239,6 +261,11 @@ body, html {
   font-size: 15px;
 }
 
+#message-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 #send-btn {
   background-color: var(--discord-blue);
   color: white;
@@ -251,6 +278,11 @@ body, html {
   transition: background-color 0.2s;
 }
 
-#send-btn:hover {
+#send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#send-btn:hover:not(:disabled) {
   background-color: var(--discord-blue-hover);
 }
