@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discord Blue Chat</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="top-bar">
+      <!-- Top-Left Area to Set and Confirm Name -->
+      <div class="user-settings-topleft">
+        <label for="username-input" class="setting-label">Your Name:</label>
+        <div class="input-group">
+          <input type="text" id="username-input" placeholder="Set nickname..." maxlength="25">
+          <button id="save-username-btn">Confirm</button>
+        </div>
+        <span id="name-status-badge" class="badge">Saved</span>
+      </div>
+
+      <div class="header-title">
+        <span class="hashtag">#</span> global-chat
+        <span class="subtext">(Messages self-destruct after 7 minutes)</span>
+      </div>
+    </header>
+
+    <!-- Main Chat Messages Area -->
+    <main class="chat-area">
+      <div id="messages-container" class="messages-container"></div>
+
+      <!-- Chat Input Area -->
+      <footer class="chat-input-area">
+        <form id="chat-form">
+          <input type="text" id="message-input" autocomplete="off" placeholder="Message #global-chat..." required>
+          <button type="submit" id="send-btn">Send</button>
+        </form>
+      </footer>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
