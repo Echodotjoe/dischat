@@ -1,8 +1,6 @@
-// Connect to a free, public, keyless WebSocket broker
-const BROKER_URL = 'wss://broker.emqx.io:8884/mqtt';
-const CHAT_TOPIC = 'gh_pages_discord_blue_chat_room_v1';
-
-const client = mqtt.connect(BROKER_URL);
+// Connect to HiveMQ Public WebSocket Broker over SSL
+const BROKER_URL = 'wss://broker.hivemq.com:8884/mqtt';
+const CHAT_TOPIC = 'discord_blue_ghpages_chat_v2';
 
 let localMessages = [];
 const EXPIRATION_MS = 7 * 60 * 1000; // 7 Minutes
@@ -11,8 +9,10 @@ const EXPIRATION_MS = 7 * 60 * 1000; // 7 Minutes
 const usernameInput = document.getElementById('username-input');
 const saveUsernameBtn = document.getElementById('save-username-btn');
 const nameStatusBadge = document.getElementById('name-status-badge');
+const connStatus = document.getElementById('conn-status');
 const chatForm = document.getElementById('chat-form');
 const messageInput = document.getElementById('message-input');
+const sendBtn = document.getElementById('send-btn');
 const messagesContainer = document.getElementById('messages-container');
 const exportTxtBtn = document.getElementById('export-txt-btn');
 
@@ -49,23 +49,58 @@ saveUsernameBtn.addEventListener('click', () => {
   }
 });
 
-// --- MQTT WebSocket Real-Time Connection ---
-client.on('connect', () => {
-  client.subscribe(CHAT_TOPIC);
+// --- MQTT Connection Initialization ---
+const clientId = 'client_' + Math.random().toString(16).substr(2, 8);
+const client = mqtt.connect(BROKER_URL, {
+  clientId: clientId,
+  keepalive: 60,
+  clean: true,
+  reconnectPeriod: 1000
 });
 
+client.on('connect', () => {
+  connStatus.textContent = 'Connected';
+  connStatus.className = 'conn-badge connected';
+  messageInput.disabled = false;
+  sendBtn.disabled = false;
+  messageInput.placeholder = "Message #global-chat...";
+
+  client.subscribe(CHAT_TOPIC, { qos: 0 }, (err) => {
+    if (err) console.error("Subscription Error:", err);
+  });
+});
+
+client.on('reconnect', () => {
+  connStatus.textContent = 'Reconnecting...';
+  connStatus.className = 'conn-badge connecting';
+});
+
+client.on('offline', () => {
+  connStatus.textContent = 'Offline';
+  connStatus.className = 'conn-badge disconnected';
+  messageInput.disabled = true;
+  sendBtn.disabled = true;
+});
+
+client.on('error', (err) => {
+  console.error("MQTT Error:", err);
+  connStatus.textContent = 'Connection Error';
+  connStatus.className = 'conn-badge disconnected';
+});
+
+// Incoming Messages
 client.on('message', (topic, payload) => {
   try {
     const msg = JSON.parse(payload.toString());
     const now = Date.now();
 
-    // Ignore if already older than 7 minutes upon arrival
-    if (now - msg.timestamp < EXPIRATION_MS) {
+    // Prevent duplicates
+    if (!localMessages.some(m => m.id === msg.id) && (now - msg.timestamp < EXPIRATION_MS)) {
       localMessages.push(msg);
       renderAllMessages();
     }
   } catch (e) {
-    console.error("Invalid message format", e);
+    console.error("Failed to parse message", e);
   }
 });
 
@@ -73,20 +108,22 @@ client.on('message', (topic, payload) => {
 chatForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const text = messageInput.value.trim();
-  if (!text) return;
+  if (!text || messageInput.disabled) return;
 
   const msgPayload = {
-    id: Date.now() + '_' + Math.random().toString(36).substring(2, 5),
+    id: Date.now() + '_' + Math.random().toString(36).substring(2, 7),
     username: currentUsername,
     text: text,
     timestamp: Date.now()
   };
 
-  client.publish(CHAT_TOPIC, JSON.stringify(msgPayload));
+  // Publish message to public room
+  client.publish(CHAT_TOPIC, JSON.stringify(msgPayload), { qos: 0 });
+
   messageInput.value = '';
 });
 
-// --- Auto-delete messages sent 7+ minutes ago ---
+// --- Auto-delete messages older than 7 minutes ---
 setInterval(() => {
   const now = Date.now();
   const initialCount = localMessages.length;
@@ -96,9 +133,9 @@ setInterval(() => {
   if (localMessages.length !== initialCount) {
     renderAllMessages();
   }
-}, 3000); // Checks every 3 seconds
+}, 3000);
 
-// --- Export to TXT Document ---
+// --- Export Active Messages to .txt ---
 exportTxtBtn.addEventListener('click', () => {
   if (localMessages.length === 0) {
     alert("No active messages in the last 7 minutes to export.");
@@ -118,7 +155,7 @@ exportTxtBtn.addEventListener('click', () => {
   URL.revokeObjectURL(url);
 });
 
-// --- Render Helpers ---
+// --- UI Rendering ---
 function renderAllMessages() {
   messagesContainer.innerHTML = '';
   localMessages.forEach(msg => {
