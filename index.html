@@ -6,9 +6,8 @@
   <title>Discord Blue Chat</title>
   <link rel="stylesheet" href="style.css">
   
-  <!-- Firebase SDKs (Required for GitHub Pages Real-Time Backend) -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  <!-- Free MQTT Library for Real-Time Chat (No Account Needed) -->
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
 <body>
   <div class="app-container">
@@ -26,10 +25,9 @@
 
       <div class="header-title">
         <span class="hashtag">#</span> global-chat
-        <span class="subtext">(Auto-deletes after 7 minutes)</span>
+        <span class="subtext">(Auto-deletes after 7 mins)</span>
       </div>
 
-      <!-- Action to export chat to .txt file -->
       <button id="export-txt-btn" class="export-btn">Download Chat (.txt)</button>
     </header>
 
